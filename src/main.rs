@@ -37,19 +37,13 @@ fn get_user_input() -> String
 }*/
 
 //function that uses titlecase to capitalize the first letter in each name
-fn capitalize(names: Vec<&str>) -> Vec<&str>
+fn capitalize(names: Vec<&str>) -> Vec<String>
 {
-    //shadow names so that it doesn't go out of scope
-    let names = names;
-    for i in 0..names.len(){
-        titlecase(names[i]);
-    }
-
-    names
+    names.into_iter().map(|name| titlecase(name)).collect()
 }
 
 //call function that reorders the names in the vector
-fn print_usernames(names: Vec<&str>)
+fn print_usernames(names: Vec<String>)
 {
     //now get the length to ensure min and max are met
     let length = names.len();
@@ -58,9 +52,9 @@ fn print_usernames(names: Vec<&str>)
     if length > 0 && length <= 3 {
         //here is my switch case!
         match names.len() {
-            1 => println!("{}", titlecase(names[0])), //This is first name only
-            2 => println!("{}, {}", titlecase(names[1]), titlecase(names[0])), //last, first
-            3 => println!("{}, {} {}", titlecase(names[2]), titlecase(names[0]), titlecase(names[1])), //last, first middle
+            1 => println!("{}", names[0]), //This is first name only
+            2 => println!("{}, {}", names[1], names[0]), //last, first
+            3 => println!("{}, {} {}", names[2], names[0], names[1]), //last, first middle
             _ => println!("ERROR"),
         }
     }
@@ -72,16 +66,16 @@ fn print_usernames(names: Vec<&str>)
 fn main() {
     //call the function to ask for user input
     //loop {
-        let user_input = get_user_input();
+    let user_input = get_user_input();
 
-        //trim
-        let names = user_input.trim().split_whitespace().collect::<Vec<&str>>();
+    //trim
+    let names = user_input.trim().split_whitespace().collect::<Vec<&str>>();
 
-        //call function that capitalizes the first letter in each name
-        let titlecase = capitalize(names);
+    //call function that capitalizes the first letter in each name
+    let titlecase = capitalize(names);
 
-        //call function that reorders the names and prints the result to the console
-        print_usernames(titlecase);
+    //call function that reorders the names and prints the result to the console
+    print_usernames(titlecase);
     //}
 }
 
