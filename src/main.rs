@@ -9,32 +9,28 @@ use input_validation::get_input;
 //function for getting user input
 fn get_user_input() -> String
 {
-    //Create a mutable string to store user input
-    let mut user_input :String = get_input("Please enter your name (first, middle, and/or last) separated by spaces: ");
-    //read the input from the user
-    io::stdin().read_line(&mut user_input).expect("Failed to read line");
+    loop {
+        //Create a mutable string to store user input
+        let mut user_input :String = get_input("Please enter your name (first, middle, and/or last) separated by spaces: ");
+        //read the input from the user
+        io::stdin().read_line(&mut user_input).expect("Failed to read line");
 
-    //input validation
-    //input_validation(&user_input);
-
-    user_input
+        //input validation
+        if input_validation(&user_input)
+        {
+            return user_input
+        }
+        else {
+            println!("Only alphabetic characters and spaces are allowed");
+        }
+    }
 }
 
-/*fn input_validation(user_input: &String)
+fn input_validation(user_input: &String) -> bool
 {
-    if !user_input.chars().all(char::is_alphabetic)
-    {
-        panic!("Please enter a valid alphabetic character.");
-        loop
-            get_user_input()
-    }
-}*/
-
-//function to trim and separate the user input into different variables
-/*fn fix_user_input<'a>(user_input: String) -> Vec<&'a str>
-{
-    user_input.trim().split_whitespace().collect::<Vec<&str>>()
-}*/
+    //panic!("Please enter a valid alphabetic character.");
+    user_input.trim().chars().all(|c| c.is_alphabetic() || c == ' ')
+}
 
 //function that uses titlecase to capitalize the first letter in each name
 fn capitalize(names: Vec<&str>) -> Vec<String>
@@ -65,7 +61,6 @@ fn print_usernames(names: Vec<String>)
 
 fn main() {
     //call the function to ask for user input
-    //loop {
     let user_input = get_user_input();
 
     //trim
@@ -76,7 +71,6 @@ fn main() {
 
     //call function that reorders the names and prints the result to the console
     print_usernames(titlecase);
-    //}
 }
 
 //creating tests and input validation
@@ -87,7 +81,7 @@ mod tests {
     use super::*;
     //make discoverable by the cargo test cli tool
     #[test]
-    fn capitalize_works() {
+    fn test_capitalize_works() {
         //need super because we need our child module to reference our function in the main module
         //can declare super and import all function
         let vector_strings :Vec<&str> = vec!["is", "capital"];
@@ -96,108 +90,20 @@ mod tests {
         assert_eq!(result, compare);
     }
     #[test]
-    fn capitalize_no_work () {
+    fn test_capitalize_no_work () {
         let vector_strings :Vec<&str> = vec!["is", "capital"];
         let result = super::capitalize(vector_strings);
         let compare = vec!["is", "capital"];
         assert_ne!(result, compare);
     }
-}
-
-
-
-
-
-
-//loop indefinitely until the user inputs correct input
-/*loop {
-    //Create a mutable string to store user input
-    let mut user_input = String::new();
-
-    //ask user for input
-    println!("Please enter your name (first, middle, and/or last) separated by spaces: ");
-
-    //read the input from the user
-    io::stdin().read_line(&mut user_input).expect("Failed to read line");
-    //println!("Name is: {}", user_input);
-
-    //first get user input, trim, and separate by whitespaces
-    let names = user_input.trim().split_whitespace().collect::<Vec<&str>>();
-
-    //input validation to ensure all characters are letters
-    if !names[0].chars().all(char::is_alphabetic) || !names[1].chars().all(char::is_alphabetic) || !names[2].chars().all(char::is_alphabetic)
-    {
-        println!("All names must contain letters only! No numbers or special characters. Try again.");
+    #[test]
+    fn test_input_validation_works() {
+        let string_name = String::from("Isidora Wright");
+        assert_eq!(input_validation(&string_name), true);
     }
-    else
-    {
-        //now get the length to ensure min and max are met
-        let length = names.len();
-
-        //input validation for number of arguments
-        if length > 0 && length <= 3 {
-            //here is my switch case!
-            match names.len() {
-                1 => println!("{}", titlecase(names[0])), //This is first name only
-                2 => println!("{}, {}", titlecase(names[1]), titlecase(names[0])), //last, first
-                3 => println!("{}, {} {}", titlecase(names[2]), titlecase(names[0]), titlecase(names[1])), //last, first middle
-                _ => println!("ERROR"),
-            }
-            break;
-        }
-        else {
-            println!("Please enter a minimum of 1 and a maximum of 3 names (first middle and/or last) separated by spaces. Try again.");
-        }
+    #[test]
+    fn test_input_validation_no_work() {
+        let string_name = String::from("Isidora Wr7ight");
+        assert_ne!(input_validation(&string_name), true);
     }
-}*/
-
-
-//Create a mutable string to store user input
-/*let mut user_input = String::new();
-
-//ask user for input
-println!("Please enter your name (first, middle, and/or last) separated by spaces: ");
-
-//read the input from the user
-io::stdin().read_line(&mut user_input).expect("Failed to read line");
-println!("Name is: {}", user_input);
-
-//remove the newline character at the end of the input using trim
-let trimmed_input = user_input.trim();
-
-//now split the string by the spaces
-/*
-I could use the split(" ") function but split_whitespace seems like
-a better option since it will remove any leading and trailing whitespace
-
-This function returns a list of words
- */
-let separated_name : Vec<&str> = trimmed_input.split_whitespace().collect::<Vec<&str>>();
-/*
-Purpose: Print Lastname, firstname middle
-OR
-last, first
-OR
-first
-*/
-//I will do this by size of the list (vector)
-// Could probably do a switch statement, but I don't know that yet
-if separated_name.len() == 3 {
-    //this means that first, middle, and last names were all input
-    println!("{}, {} {}", separated_name[2], separated_name[0], separated_name[1]);
 }
-else if separated_name.len() == 2 {
-    //this means that first and last names were inputted
-    println!("{}, {}", separated_name[1], separated_name[0]);
-}
-else if separated_name.len() == 1 {
-    //this means that only the first name was inputted
-    println!("{}", separated_name[0]);
-}
-else {
-    //this is the case of when more than 3 names were input or nothing was input
-    println!("Please enter a minimum of 1 and a maximum of 3 names (first middle and/or last) separated by spaces. Try again.");
-    //ask again for user input
-    //Maybe in the future, I will do a loop that says while out of bounds, keep asking for user input
-    //io::stdin().read_line(&mut user_input).expect("Failed to read line");
-}*/
